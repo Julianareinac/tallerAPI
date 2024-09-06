@@ -1,0 +1,420 @@
+openapi: '3.0.1'
+info:
+  title: 'tallerApp'
+  version: 0.0.1
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+  - url: https://localhost:8080/api
+    description: Development server with TLS Profile
+paths:
+  /admin/users:
+    post:
+      summary: Crea un nuevo usuario
+      operationId: createUser
+      tags:
+        - User Management
+      requestBody:
+        description: El usuario a crear
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUserDTO'
+      responses:
+        '201':
+          description: Usuario creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Solicitud incorrecta - El login o correo electrónico ya están en uso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflicto - El usuario ya existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: Actualiza un usuario existente
+      operationId: updateUser
+      tags:
+        - User Management
+      requestBody:
+        description: El usuario a actualizar
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUserDTO'
+      responses:
+        '200':
+          description: Usuario actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserDTO'
+        '400':
+          description: Solicitud incorrecta - El correo o login ya están en uso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403': 
+          description: Usuario no tiene el permiso para ejecutar la operacion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      summary: Actualiza parcialmente un usuario existente
+      operationId: patchUser
+      tags:
+        - User Management
+      requestBody:
+        description: Campos del usuario a actualizar parcialmente
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUserDTO'
+      responses:
+        '200':
+          description: Usuario actualizado parcialmente con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserDTO'
+        '400':
+          description: Solicitud incorrecta - El correo o login ya están en uso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403': 
+          description: Usuario no tiene el permiso para ejecutar la operacion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      summary: Obtener todos los usuarios
+      operationId: getAllUsers
+      tags:
+        - User Management
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Número de página
+        - in: query
+          name: size
+          schema:
+            type: integer
+          description: Número de registros por página
+        - in: query
+          name: sort
+          schema:
+            type: string
+          description: >
+            Criterios de ordenación en el formato: propiedad(,asc|desc). 
+            El orden predeterminado es ascendente. Se admiten múltiples criterios de ordenación.
+      responses:
+        '200':
+          description: Lista de usuarios obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminUserDTO'
+        '400':
+          description: Solicitud incorrecta
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /admin/users/{login}:
+    get:
+      summary: Obtener un usuario por login
+      operationId: getUser
+      tags:
+        - User Management
+      parameters:
+        - in: path
+          name: login
+          required: true
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9]+$'
+          description: El login del usuario a recuperar
+      responses:
+        '200':
+          description: Usuario recuperado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUserDTO'
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Solicitud incorrecta - Login inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403': 
+          description: Usuario no tiene el permiso para ejecutar la operacion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Eliminar un usuario por login
+      operationId: deleteUser
+      tags:
+        - User Management
+      parameters:
+        - in: path
+          name: login
+          required: true
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9]+$'
+          description: El login del usuario a eliminar
+      responses:
+        '204':
+          description: Usuario eliminado exitosamente
+        '404':
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Solicitud incorrecta - Login inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Usuario no autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403': 
+          description: Usuario no tiene el permiso para ejecutar la operacion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/login:
+    post:
+      summary: Iniciar sesión
+      operationId: login
+      tags:
+        - Authentication
+      requestBody:
+        description: Credenciales de inicio de sesión
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                password:
+                  type: string
+              required:
+                - login
+                - password
+      responses:
+        '200':
+          description: Inicio de sesión exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Token de autenticación
+        '401':
+          description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Solicitud incorrecta - Parámetros faltantes o inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/recuperar-contrasena:
+    post:
+      summary: Recuperar contraseña
+      operationId: recoverPassword
+      tags:
+        - Authentication
+      requestBody:
+        description: Correo electrónico para recuperación de contraseña
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              required:
+                - email
+      responses:
+        '200':
+          description: Instrucciones para recuperar la contraseña enviadas con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Confirmación del envío
+        '404':
+          description: Correo no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Solicitud incorrecta - Correo electrónico inválido o faltante
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    AdminUserDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        login:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        activated:
+          type: boolean
+        langKey:
+          type: string
+        createdBy:
+          type: string
+        createdDate:
+          type: string
+          format: date-time
+        lastModifiedBy:
+          type: string
+        lastModifiedDate:
+          type: string
+          format: date-time
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        login:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        activated:
+          type: boolean
+        langKey:
+          type: string
+        createdBy:
+          type: string
+        createdDate:
+          type: string
+          format: date-time
+        lastModifiedBy:
+          type: string
+        lastModifiedDate:
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Código de error
+        message:
+          type: string
+          description: Descripción del error
