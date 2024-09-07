@@ -4,6 +4,13 @@ import com.example.demo.model.AdminUserDTO;
 import com.example.demo.model.User;
 import com.example.demo.responses.ErrorResponse;
 import com.example.demo.service.GeneralServiceImpl;
+import com.example.demo.utils.JwtUtil;
+import io.jsonwebtoken.Claims;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +25,11 @@ public class UserController {
 
     private final GeneralServiceImpl generalService;
     private List<User> users = new ArrayList<>();
+    private final JwtUtil jwtUtil;
 
-    public UserController(GeneralServiceImpl generalService) {
+    public UserController(GeneralServiceImpl generalService, JwtUtil jwtUtil) {
         this.generalService = generalService;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/user")
@@ -37,15 +46,31 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
-    @PutMapping
-    public ResponseEntity<?> updateUser(@RequestBody AdminUserDTO adminUserDTO) {
-        Optional<User> existingUser = users.stream()
-                .filter(user -> user.getLogin().equals(adminUserDTO.getLogin()))
-                .findFirst();
+    @PutMapping("/update")
+    public ResponseEntity<?> updateUser(@RequestBody User adminUserDTO, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+        Optional<User> existingUser = generalService.findByLogin(adminUserDTO.getLogin());
 
         if (existingUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ErrorResponse(404, "Usuario no encontrado"));
+        }
+        if (adminUserDTO.getLogin() == null || adminUserDTO.getLogin().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(400, "El campo 'login' es obligatorio"));
+        }
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse(401, "Token no proporcionado o formato incorrecto"));
+        }
+
+        String token = authorizationHeader.substring(7).trim();
+
+        try {
+            JwtUtil.validateToken(token);
+        } catch (Exception e) {
+            System.out.println("Error al validar el token: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse(401, "Token inválido o expirado"));
         }
 
         // Actualizar la información del usuario
@@ -55,6 +80,8 @@ public class UserController {
         user.setEmail(adminUserDTO.getEmail());
         user.setActivated(adminUserDTO.isActivated());
         user.setLangKey(adminUserDTO.getLangKey());
+
+        generalService.save(user);
 
         return ResponseEntity.ok(user);
     }
@@ -84,19 +111,32 @@ public class UserController {
     public ResponseEntity<List<AdminUserDTO>> getAllUsers(@RequestParam Optional<Integer> page,
                                                           @RequestParam Optional<Integer> size,
                                                           @RequestParam Optional<String> sort) {
-        // Implementar lógica de paginación y ordenamiento según los parámetros
-        List<AdminUserDTO> dtoList = users.stream()
+
+        int pageNumber = page.orElse(0); // Página por defecto: 0
+        int pageSize = size.orElse(10);  // Tamaño por defecto: 10
+        String sortBy = sort.orElse("id"); // Ordenar por defecto por "id"
+
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).ascending());
+
+
+        Page<User> userPage = generalService.getAllUsers(pageable);
+
+        List<AdminUserDTO> dtoList = userPage.stream()
                 .map(AdminUserDTO::new)
                 .toList();
 
         return ResponseEntity.ok(dtoList);
     }
 
+
     @GetMapping("/{login}")
     public ResponseEntity<?> getUser(@PathVariable String login) {
-        Optional<User> user = users.stream()
-                .filter(u -> u.getLogin().equals(login))
-                .findFirst();
+        Optional<User> user = generalService.findByLogin(login);
+        if (login == null || login.trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(400, "El parámetro 'login' es obligatorio y no puede estar vacío"));
+        }
 
         if (user.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

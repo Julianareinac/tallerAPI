@@ -1,6 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.model.LoginRequest;
+import com.example.demo.model.User;
 import com.example.demo.responses.AuthResponse;
 import com.example.demo.responses.ErrorResponse;
 import com.example.demo.service.GeneralServiceImpl;
@@ -20,13 +21,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@RequestBody User loginRequest) {
         // Lógica para validar credenciales
         if(!generalService.validarUsuario(loginRequest.getLogin())){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponse(400, "El usuario no existe"));
         }
         if(!generalService.validateKey(loginRequest.getLogin(), loginRequest.getPassword())){
+            System.out.println("Credenciales inválidas para: " + loginRequest.getLogin() + " con contraseña " + loginRequest.getPassword());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponse(401, "Credenciales inválidas"));
         }
