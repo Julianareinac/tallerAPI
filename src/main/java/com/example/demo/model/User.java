@@ -14,22 +14,16 @@ public class User implements Serializable {
     @Column(name = "login")
     private String login;
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     @Column(name = "password")
     private String password;
 
     private String firstName;
+
     private String lastName;
 
     @Column(name = "email")
     private String email;
+
     private boolean activated;
 
     @Column(name = "lang_key")
@@ -110,6 +104,14 @@ public class User implements Serializable {
 
     public Long getId() {
         return id;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
 
