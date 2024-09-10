@@ -40,7 +40,7 @@ public class User implements Serializable {
         this.langKey = langKey;
     }
 
-    public User(AdminUserDTO adminUserDTO) {
+    public User(UserDTO adminUserDTO) {
         this.login = adminUserDTO.getLogin();
         this.firstName = adminUserDTO.getFirstName();
         this.lastName = adminUserDTO.getLastName();

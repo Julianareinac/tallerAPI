@@ -1,7 +1,7 @@
 package com.example.demo.controllers;
 
-import com.example.demo.model.AdminUserDTO;
 import com.example.demo.model.User;
+import com.example.demo.model.UserDTO;
 import com.example.demo.responses.ErrorResponse;
 import com.example.demo.service.GeneralServiceImpl;
 import com.example.demo.utils.JwtUtil;
@@ -87,7 +87,7 @@ public class UserController {
     }
 
     @PatchMapping
-    public ResponseEntity<?> patchUser(@RequestBody AdminUserDTO adminUserDTO) {
+    public ResponseEntity<?> patchUser(@RequestBody UserDTO adminUserDTO) {
         Optional<User> existingUser = users.stream()
                 .filter(user -> user.getLogin().equals(adminUserDTO.getLogin()))
                 .findFirst();
@@ -108,7 +108,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AdminUserDTO>> getAllUsers(@RequestParam Optional<Integer> page,
+    public ResponseEntity<List<UserDTO>> getAllUsers(@RequestParam Optional<Integer> page,
                                                           @RequestParam Optional<Integer> size,
                                                           @RequestParam Optional<String> sort) {
 
@@ -122,8 +122,8 @@ public class UserController {
 
         Page<User> userPage = generalService.getAllUsers(pageable);
 
-        List<AdminUserDTO> dtoList = userPage.stream()
-                .map(AdminUserDTO::new)
+        List<UserDTO> dtoList = userPage.stream()
+                .map(UserDTO::new)
                 .toList();
 
         return ResponseEntity.ok(dtoList);
@@ -143,7 +143,7 @@ public class UserController {
                     .body(new ErrorResponse(404, "Usuario no encontrado"));
         }
 
-        return ResponseEntity.ok(new AdminUserDTO(user.get()));
+        return ResponseEntity.ok(new UserDTO(user.get()));
     }
 
     @DeleteMapping("/{login}")
