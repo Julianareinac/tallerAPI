@@ -28,6 +28,16 @@ public class User implements Serializable {
     private String firstName;
     private String lastName;
 
+    public String getSecurityAnswer() {
+        return securityAnswer;
+    }
+
+    public void setSecurityAnswer(String securityAnswer) {
+        this.securityAnswer = securityAnswer;
+    }
+
+    private String securityAnswer;
+
     @Column(name = "email")
     private String email;
     private boolean activated;
