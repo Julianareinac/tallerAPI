@@ -3,18 +3,20 @@ package com.example.demo.model;
 
 import java.io.Serializable;
 
-public class AdminUserDTO implements Serializable {
+public class UserDTO implements Serializable {
 
+    private Long id;
     private String login;
+    private String password;
     private String firstName;
     private String lastName;
     private String email;
     private boolean activated;
     private String langKey;
 
-    public AdminUserDTO() {}
+    public UserDTO() {}
 
-    public AdminUserDTO(User user) {
+    public UserDTO(User user) {
         this.login = user.getLogin();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
@@ -70,5 +72,21 @@ public class AdminUserDTO implements Serializable {
 
     public void setLangKey(String langKey) {
         this.langKey = langKey;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

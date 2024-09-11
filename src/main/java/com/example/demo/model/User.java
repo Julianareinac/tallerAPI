@@ -14,18 +14,11 @@ public class User implements Serializable {
     @Column(name = "login")
     private String login;
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     @Column(name = "password")
     private String password;
 
     private String firstName;
+
     private String lastName;
 
     public String getSecurityAnswer() {
@@ -40,6 +33,7 @@ public class User implements Serializable {
 
     @Column(name = "email")
     private String email;
+
     private boolean activated;
 
     @Column(name = "lang_key")
@@ -56,7 +50,7 @@ public class User implements Serializable {
         this.langKey = langKey;
     }
 
-    public User(AdminUserDTO adminUserDTO) {
+    public User(UserDTO adminUserDTO) {
         this.login = adminUserDTO.getLogin();
         this.firstName = adminUserDTO.getFirstName();
         this.lastName = adminUserDTO.getLastName();
@@ -120,6 +114,14 @@ public class User implements Serializable {
 
     public Long getId() {
         return id;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
 

@@ -1,0 +1,78 @@
+<form [formGroup]="editForm" (ngSubmit)="onSubmit()">
+  <div class="form-group">
+    <label for="login">Login</label>
+    <input
+      type="text"
+      id="login"
+      formControlName="login"
+      class="form-control"
+      placeholder="Enter your login"
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="password">Password</label>
+    <input
+      type="password"
+      id="password"
+      formControlName="password"
+      class="form-control"
+      placeholder="Enter your password"
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="firstName">First Name</label>
+    <input
+      type="text"
+      id="firstName"
+      formControlName="firstName"
+      class="form-control"
+      placeholder="Enter your first name"
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="lastName">Last Name</label>
+    <input
+      type="text"
+      id="lastName"
+      formControlName="lastName"
+      class="form-control"
+      placeholder="Enter your last name"
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="email">Email</label>
+    <input
+      type="email"
+      id="email"
+      formControlName="email"
+      class="form-control"
+      placeholder="Enter your email"
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="activated">Activated</label>
+    <input
+      type="checkbox"
+      id="activated"
+      formControlName="activated"
+      class="form-control"
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="langKey">Language Key</label>
+    <select id="langKey" formControlName="langKey" class="form-control">
+      <option value="en">English</option>
+      <option value="es">Spanish</option>
+      <option value="fr">French</option>
+    </select>
+  </div>
+
+  <!-- Submit Button -->
+  <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid">Submit</button>
+</form>
