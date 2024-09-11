@@ -42,11 +42,9 @@ public class AuthController {
     @PostMapping("/recuperar-contrasena")
     public ResponseEntity<?> recoverPassword(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
-            @RequestParam String username,
-            @RequestParam String newPassword,
-            @RequestParam String securityAnswer) {
+            @RequestBody User dto) {
 
-        Optional<User> user = generalService.findByLogin(username);
+        Optional<User> user = generalService.findByLogin(dto.getLogin());
 
         if (user.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -70,14 +68,14 @@ public class AuthController {
         }
 
         // Verificar la respuesta de seguridad o código temporal
-        boolean isVerificationValid = generalService.verifySecurityAnswer(username, securityAnswer);
+        boolean isVerificationValid = generalService.verifySecurityAnswer(dto.getLogin(), dto.getSecurityAnswer());
         if (!isVerificationValid) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(400, "Respuesta de verificación incorrecta"));
         }
 
 
-        generalService.updatePassword(user.get(),newPassword);
+        generalService.updatePassword(user.get(),dto.getPassword());
 
 
 

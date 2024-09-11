@@ -87,7 +87,7 @@ public class UserController {
     }
 
     @PatchMapping
-    public ResponseEntity<?> patchUser(@RequestBody User adminUserDTO, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+    public ResponseEntity<?> patchUser(@RequestBody UserDTO adminUserDTO, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         Optional<User> existingUser = generalService.findByLogin(adminUserDTO.getLogin());
 
         if (existingUser.isEmpty()) {
