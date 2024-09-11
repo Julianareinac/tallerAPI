@@ -87,14 +87,26 @@ public class UserController {
     }
 
     @PatchMapping
-    public ResponseEntity<?> patchUser(@RequestBody UserDTO adminUserDTO) {
-        Optional<User> existingUser = users.stream()
-                .filter(user -> user.getLogin().equals(adminUserDTO.getLogin()))
-                .findFirst();
+    public ResponseEntity<?> patchUser(@RequestBody User adminUserDTO, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+        Optional<User> existingUser = generalService.findByLogin(adminUserDTO.getLogin());
 
         if (existingUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ErrorResponse(404, "Usuario no encontrado"));
+        }
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse(401, "Token no proporcionado o formato incorrecto"));
+        }
+
+        String token = authorizationHeader.substring(7).trim();
+
+        try {
+            JwtUtil.validateToken(token);
+        } catch (Exception e) {
+            System.out.println("Error al validar el token: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse(401, "Token inválido o expirado"));
         }
 
         // Actualizar parcialmente la información del usuario
@@ -103,6 +115,8 @@ public class UserController {
         if (adminUserDTO.getLastName() != null) user.setLastName(adminUserDTO.getLastName());
         if (adminUserDTO.getEmail() != null) user.setEmail(adminUserDTO.getEmail());
         if (adminUserDTO.getLangKey() != null) user.setLangKey(adminUserDTO.getLangKey());
+
+        generalService.save(user);
 
         return ResponseEntity.ok(user);
     }
@@ -148,16 +162,18 @@ public class UserController {
 
     @DeleteMapping("/{login}")
     public ResponseEntity<?> deleteUser(@PathVariable String login) {
-        Optional<User> user = users.stream()
-                .filter(u -> u.getLogin().equals(login))
-                .findFirst();
 
-        if (user.isEmpty()) {
+        if (generalService.findByLogin(login).isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ErrorResponse(404, "Usuario no encontrado"));
         }
 
-        users.remove(user.get());
+        if (login == null || login.trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(400, "El parámetro 'login' es obligatorio y no puede estar vacío"));
+        }
+
+        generalService.delete(generalService.findByLogin(login).get());
 
         return ResponseEntity.noContent().build();
     }

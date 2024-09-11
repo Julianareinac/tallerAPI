@@ -40,4 +40,23 @@ public class GeneralServiceImpl {
     public Page<User> getAllUsers(Pageable pageable) {
         return userRepository.findAll(pageable);
     }
+
+    public void delete(User user) {
+        userRepository.delete(user);
+    }
+
+    public void updatePassword(User user, String password) {
+        user.setPassword(password);
+    }
+
+    public boolean verifySecurityAnswer(String username, String securityAnswer) {
+        Optional<User> userOptional = userRepository.findByLogin(username);
+
+        if (userOptional.isEmpty()) {
+            return false; // Usuario no encontrado
+        }
+
+        User user = userOptional.get();
+        return user.getSecurityAnswer().equalsIgnoreCase(securityAnswer);
+    }
 }
