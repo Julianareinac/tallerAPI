@@ -2,6 +2,7 @@ package com.example.demo.controllers;
 
 import com.example.demo.model.LoginRequest;
 import com.example.demo.model.User;
+import com.example.demo.model.UserDTO;
 import com.example.demo.responses.AuthResponse;
 import com.example.demo.responses.ErrorResponse;
 import com.example.demo.service.GeneralServiceImpl;
@@ -24,7 +25,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User loginRequest) {
+    public ResponseEntity<?> login(@RequestBody UserDTO loginRequest) {
         // Lógica para validar credenciales
         if(!generalService.validarUsuario(loginRequest.getLogin())){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

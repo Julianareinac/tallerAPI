@@ -1,4 +1,8 @@
 
+export interface IAuthResponse {
+    token?: string | null;
+}
+
 export interface IUser {
     id?: number;
     login?: string | null;
