@@ -41,31 +41,13 @@ public class AuthController {
     }
 
     @PostMapping("/recuperar-contrasena")
-    public ResponseEntity<?> recoverPassword(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
-            @RequestBody User dto) {
+    public ResponseEntity<?> recoverPassword(@RequestBody User dto) {
 
         Optional<User> user = generalService.findByLogin(dto.getLogin());
 
         if (user.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ErrorResponse(404, "Usuario no encontrado"));
-        }
-
-        // Verificar que el encabezado de autorización esté presente y tenga el formato correcto
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse(401, "Token no proporcionado o formato incorrecto"));
-        }
-
-        String token = authorizationHeader.substring(7);
-
-        try {
-            // Validar el token
-            JwtUtil.validateToken(token);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse(401, "Token inválido o expirado"));
         }
 
         // Verificar la respuesta de seguridad o código temporal
